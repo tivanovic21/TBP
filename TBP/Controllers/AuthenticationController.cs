@@ -1,7 +1,10 @@
+using System.Data.Common;
+using System.Text.Json;
 using Microsoft.AspNetCore.Mvc;
 using TBP.Data;
 using Microsoft.EntityFrameworkCore;
 using Npgsql;
+using TBP.Models;
 
 namespace TBP.Controllers;
 
@@ -41,11 +44,39 @@ public class AuthenticationController : Controller
     }
     
     [HttpPost]
-    public IActionResult Register(string username, string password)
+    public IActionResult Register(string email, string password, string firstName, string lastName, DateTime dob, int roleId)
     {
-        return View();
-    }
+        try
+        {
+            var newUser = new User()
+            {
+                Email = email,
+                Password = password,
+                Metadata = JsonSerializer.Serialize(new Metadata()
+                {
+                    FirstName = firstName,
+                    LastName = lastName,
+                    DateOfBirth = dob,
+                }),
+                RoleId = roleId
+            };
+            
+            _context.Users.Add(newUser);
+            _context.SaveChanges();
 
+            return RedirectToAction("Login", "authentication");
+        }
+        catch (DbException dbException)
+        {
+            ModelState.AddModelError("Db Error", dbException.Message);
+            return BadRequest(dbException.Message);
+        }
+        catch (Exception e)
+        {
+            ModelState.AddModelError("General Error", e.Message);
+            return BadRequest(e.Message);
+        }
+    }
     private async Task<bool> VerifyPassword(string plainTextPassword, string storedPasswordHash)
     {
         var query = "SELECT crypt(@password, @storedHash) = @storedHash;";

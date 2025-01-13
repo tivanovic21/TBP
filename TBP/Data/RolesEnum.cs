@@ -1,5 +1,6 @@
-public enum Roles
+namespace TBP.Data;
+public enum Roles : int
 {
-    Admin,
-    User
+    Admin = 1,
+    User = 2
 }

@@ -1,0 +1,21 @@
+@{
+    ViewData["Title"] = "Register";
+}
+
+<div class="text-center">
+    <h1 class="display-4">Register</h1>
+    <form asp-action="Register" asp-controller="Authentication">
+        <input type="text" name="email" placeholder="Email" /><br/>
+        <input type="password" name="password" placeholder="Password"/><br/>
+        <input type="text" name="firstName" placeholder="First name"/><br/>
+        <input type="text" name="lastName" placeholder="Last name"/><br/>
+        <input type="date" name="dob" placeholder="Date of birth"/><br/>
+        <select name="roleId">
+            @foreach (TBP.Data.Roles role in Enum.GetValues(typeof(TBP.Data.Roles)))
+            {
+                <option value="@((int)role)">@role</option>
+            }
+        </select><br/>
+        <input type="submit" value="Register" />
+    </form>
+</div>
