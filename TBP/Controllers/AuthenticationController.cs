@@ -1,3 +1,4 @@
+using System.Data;
 using System.Data.Common;
 using System.Text.Json;
 using Microsoft.AspNetCore.Mvc;
@@ -31,10 +32,27 @@ public class AuthenticationController : Controller
         if (user == null) return NotFound("No active user with email " + email + " found");
         
         var isPasswordValid = await VerifyPassword(password, user.Password);
-        
-        
         if (!isPasswordValid) return Unauthorized("Invalid email and password combination");
         
+        var userIpAddress = HttpContext.Connection.RemoteIpAddress?.ToString() ?? "127.0.0.1";
+
+        await using var connection = new NpgsqlConnection(_context.Database.GetDbConnection().ConnectionString);
+        await connection.OpenAsync();
+
+        await using (var command = connection.CreateCommand())
+        {
+            command.CommandText = "SELECT login_user(@user_id, @user_ip);";
+            command.Parameters.Add(new NpgsqlParameter("user_id", user.ID));
+            command.Parameters.Add(new NpgsqlParameter("user_ip", userIpAddress));
+            await command.ExecuteNonQueryAsync();
+        }
+            
+        Response.Cookies.Append("UserId", user.ID.ToString(), new CookieOptions
+         {
+             HttpOnly = true,
+             IsEssential = true,
+             Expires = DateTimeOffset.UtcNow.AddDays(7)
+         });
         return RedirectToAction("Index", "Home");
     }
     
@@ -76,6 +94,25 @@ public class AuthenticationController : Controller
             ModelState.AddModelError("General Error", e.Message);
             return BadRequest(e.Message);
         }
+    }
+
+    public async Task<IActionResult> Logout()
+    {
+        await using var connection = new NpgsqlConnection(_context.Database.GetDbConnection().ConnectionString);
+        await connection.OpenAsync();
+        
+        var userId = Request.Cookies["UserId"];
+        if (string.IsNullOrEmpty(userId)) return Unauthorized("User ID not found in cookies");
+        
+        await using (var command = connection.CreateCommand())
+        {
+            command.CommandText = "SELECT logout_user(@user_id);";
+            command.Parameters.Add(new NpgsqlParameter("user_id", int.Parse(userId)));
+
+            await command.ExecuteNonQueryAsync();
+        }
+        
+        return RedirectToAction("Login", "Authentication");
     }
     private async Task<bool> VerifyPassword(string plainTextPassword, string storedPasswordHash)
     {
