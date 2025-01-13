@@ -1,4 +1,14 @@
-﻿<!DOCTYPE html>
+﻿@using TBP.Services
+@inject IUserService UserService
+@inject IHttpContextAccessor HttpContextAccessor
+
+@{
+    string userName = await UserService.GetUserNameAsync(HttpContextAccessor.HttpContext);
+    bool isLoggedIn = !string.IsNullOrEmpty(userName);
+    bool isAdmin = await UserService.IsAdminAsync(HttpContextAccessor.HttpContext);
+}
+
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="utf-8"/>
@@ -20,20 +30,33 @@
             <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
                 <ul class="navbar-nav flex-grow-1">
                     <li class="nav-item">
-                        <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Index">Home</a>
+                        @if (isLoggedIn)
+                        {
+                            <a class="nav-link text-dark">@($"Welcome {userName}")</a>
+                        }
+                        else
+                        {
+                            <a class="nav-link text-dark">Please log in</a>
+                        }
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
+                        <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Index">Home</a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link text-dark" asp-area="" asp-controller="Authentication" asp-action="Login">Login</a>
                     </li>
-                    <li class="nav-item">
-                        <a class="nav-link text-dark" asp-area="" asp-controller="Authentication" asp-action="Register">Register</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link text-dark" asp-area="" asp-controller="Authentication" asp-action="Logout">Logout</a>
-                    </li>
+                    @if (isLoggedIn)
+                    {
+                        <li class="nav-item">
+                            <a class="nav-link text-dark" asp-area="" asp-controller="Authentication" asp-action="Logout">Logout</a>
+                        </li> 
+                    }
+                    @if (isAdmin)
+                    {
+                        <li class="nav-item">
+                            <a class="nav-link text-dark" asp-area="" asp-controller="Authentication" asp-action="Register">Register</a>
+                        </li>
+                    }
                 </ul>
             </div>
         </div>

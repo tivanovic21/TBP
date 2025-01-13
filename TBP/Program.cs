@@ -2,6 +2,7 @@ using Microsoft.EntityFrameworkCore;
 using Npgsql;
 using TBP.Data;
 using TBP.Models;
+using TBP.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -13,6 +14,9 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
         options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")),
     ServiceLifetime.Scoped 
 );
+
+builder.Services.AddHttpContextAccessor();
+builder.Services.AddScoped<IUserService, UserService>();
 
 var app = builder.Build();
 

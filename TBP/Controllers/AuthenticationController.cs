@@ -62,10 +62,27 @@ public class AuthenticationController : Controller
     }
     
     [HttpPost]
-    public IActionResult Register(string email, string password, string firstName, string lastName, DateTime dob, int roleId)
+    public async Task<IActionResult> Register(string email, string password, string firstName, string lastName, DateTime dob, int roleId)
     {
         try
         {
+            if (!int.TryParse(Request.Cookies["UserId"], out var userId))
+            {
+                return Unauthorized("Not logged in!");
+            }           
+            
+            await using var connection = new NpgsqlConnection(_context.Database.GetDbConnection().ConnectionString);
+            await connection.OpenAsync();
+
+            await using (var command = connection.CreateCommand())
+            {
+                command.CommandText = "SELECT is_admin(@user_id);";
+                command.Parameters.Add(new NpgsqlParameter("user_id", userId));
+                var result = await command.ExecuteScalarAsync();
+                
+                if (result is bool and false) return Unauthorized("Only administrator can register a new user!");
+            }
+            
             var newUser = new User()
             {
                 Email = email,
@@ -111,6 +128,8 @@ public class AuthenticationController : Controller
 
             await command.ExecuteNonQueryAsync();
         }
+
+        Response.Cookies.Delete("UserId");
         
         return RedirectToAction("Login", "Authentication");
     }

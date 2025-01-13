@@ -198,7 +198,6 @@ END;
 $$ LANGUAGE plpgsql;
 
 -- policy
-SET app.current_user_id = '123'; -- ovo mora biti dinamično kroz app
 
 CREATE OR REPLACE FUNCTION has_existing_session(user_id INT)
     RETURNS BOOLEAN AS $$
