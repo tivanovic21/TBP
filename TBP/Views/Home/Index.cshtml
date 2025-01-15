@@ -1,8 +1,31 @@
-﻿@{
-    ViewData["Title"] = "Home Page";
+﻿@using TBP.Data
+@{
+    ViewData["Title"] = "TBP";
 }
 
 <div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
+    <h1>TBP - User Management App</h1>
+    <p>Lista postojećih korisnika za prijavu:</p>
+
+    <table class="table table-bordered table-striped mt-4" style="width: 50%; margin: 0 auto;">
+        <thead class="thead-dark">
+        <tr>
+            <th>Email</th>
+            <th>Password</th>
+            <th>Role</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr>
+            <td>admin@admin.com</td>
+            <td>admin123</td>
+            <td>@Roles.Admin</td>
+        </tr>
+        <tr>
+            <td>user@user.com</td>
+            <td>user1234</td>
+            <td>@Roles.User</td>
+        </tr>
+        </tbody>
+    </table>
 </div>

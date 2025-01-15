@@ -11,7 +11,9 @@ builder.Services.AddControllersWithViews();
 
 // Use the configured data source in EF Core
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
-        options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")),
+        options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection"))
+            .EnableSensitiveDataLogging()
+            .LogTo(Console.WriteLine, LogLevel.Information),
     ServiceLifetime.Scoped 
 );
 

@@ -4,4 +4,5 @@ public interface IUserService
 {
     Task<string> GetUserNameAsync(HttpContext context);
     Task<bool> IsAdminAsync(HttpContext context);
+    Task<bool> IsAuthenticatedAsync(HttpContext context);
 }

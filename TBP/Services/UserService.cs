@@ -1,4 +1,5 @@
 using Microsoft.EntityFrameworkCore;
+using Npgsql;
 using TBP.Data;
 using TBP.Models;
 
@@ -27,13 +28,35 @@ public class UserService : IUserService
     {
         if (context.Request.Cookies.TryGetValue("UserId", out var userIdValue) && int.TryParse(userIdValue, out var userId))
         {
-            var user = await _context.Users.FirstOrDefaultAsync(u => u.ID == userId);
+            await using var connection = new NpgsqlConnection(_context.Database.GetDbConnection().ConnectionString);
+            await connection.OpenAsync();
 
-            if (user != null && user.RoleId == (int)Roles.Admin)
-            {
-                return true;
-            }
-            else return false;
+            var command = connection.CreateCommand();
+            command.CommandText = "SELECT is_admin (@userId)";
+            command.Parameters.AddWithValue("userId", userId);
+
+            var result = await command.ExecuteScalarAsync(); 
+
+            return result != null && (bool)result;
+        }
+        
+        return false;
+    }
+
+    public async Task<bool> IsAuthenticatedAsync(HttpContext context)
+    {
+        if (context.Request.Cookies.TryGetValue("UserId", out var userIdValue) && int.TryParse(userIdValue, out var userId))
+        {
+            await using var connection = new NpgsqlConnection(_context.Database.GetDbConnection().ConnectionString);
+            await connection.OpenAsync();
+
+            var command = connection.CreateCommand();
+            command.CommandText = "SELECT has_existing_session(@userId)";
+            command.Parameters.AddWithValue("userId", userId);
+
+            var result = await command.ExecuteScalarAsync(); 
+
+            return result != null && (bool)result;
         }
         
         return false;

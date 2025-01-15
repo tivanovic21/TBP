@@ -121,6 +121,17 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
+CREATE OR REPLACE FUNCTION log_on_update_user()
+RETURNS TRIGGER AS $$
+BEGIN
+    NEW.createdat = OLD.createdat;
+    NEW.updatedat = CURRENT_TIMESTAMP::timestamp;
+    PERFORM create_audit_log('update', NEW.ID);
+    
+    return NEW;
+end;
+$$ LANGUAGE plpgsql;
+
 -- triggers
 CREATE TRIGGER check_password_rules
     BEFORE INSERT OR UPDATE ON Users
@@ -136,3 +147,8 @@ CREATE TRIGGER age_calculation
     BEFORE INSERT OR UPDATE ON Users
     FOR EACH ROW
 EXECUTE FUNCTION calculate_age();
+
+CREATE TRIGGER log_on_update
+    BEFORE UPDATE ON Users
+    FOR EACH ROW
+EXECUTE FUNCTION log_on_update_user();

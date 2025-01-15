@@ -1,0 +1,68 @@
+@using Microsoft.EntityFrameworkCore.Infrastructure
+@using TBP.Data
+@model TBP.Models.User
+
+@{
+    ViewData["Title"] = "My Account";
+}
+
+<div style="display: flex; flex-direction: column; align-items: center; justify-content: center; margin-top: 50px;">
+    <h2>My Account</h2>
+
+    <!-- Side-by-Side Content -->
+    <div style="display: flex; gap: 20px; align-items: flex-start; justify-content: center; width: 100%; max-width: 1200px; margin-top: 20px;">
+        <!-- User Details Section -->
+        <div style="flex: 1; padding: 20px; border: 1px solid #ccc; border-radius: 8px; max-width: 600px; text-align: left;">
+            <h3>User Details</h3>
+            <ul style="list-style: none; padding: 0;">
+                <li><strong>ID:</strong> @Model.ID</li>
+                <li><strong>Email:</strong> @Model.Email</li>
+                <li><strong>Role:</strong> @(Model.RoleId == 1 ? "Admin" : "User")</li>
+            </ul>
+
+            <h3>Metadata</h3>
+            <ul style="list-style: none; padding: 0;">
+                <li><strong>First Name:</strong> @Model.MetadataModel.FirstName</li>
+                <li><strong>Last Name:</strong> @Model.MetadataModel.LastName</li>
+                <li><strong>Date of Birth:</strong> @Model.MetadataModel.DateOfBirth.ToShortDateString()</li>
+                <li><strong>Age:</strong> @Model.MetadataModel.Age</li>
+            </ul>
+
+            <h3>Audit Information</h3>
+            <ul style="list-style: none; padding: 0;">
+                <li><strong>Created At:</strong> @Model.CreatedAt.ToString("g")</li>
+                <li><strong>Updated At:</strong> @(Model.UpdatedAt?.ToString("g") ?? "N/A")</li>
+                <li><strong>Is Deleted:</strong> @(Model.IsDeleted ? "Yes" : "No")</li>
+            </ul>
+        </div>
+
+        <div style="flex: 1; padding: 20px; border: 1px solid #ccc; border-radius: 8px; max-width: 600px; text-align: left;">
+            <h3>Update Account</h3>
+            <form method="post" asp-action="UpdateAccount" asp-controller="User">
+                <div style="margin-bottom: 15px;">
+                    <label for="Email" style="display: block; font-weight: bold;">Email</label>
+                    <input type="email" id="Email" name="Email" value="@Model.Email" style="width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 5px;" required />
+                </div>
+
+                <div style="margin-bottom: 15px;">
+                    <label for="FirstName" style="display: block; font-weight: bold;">First Name</label>
+                    <input type="text" id="FirstName" name="FirstName" value="@Model.MetadataModel.FirstName" style="width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 5px;" />
+                </div>
+
+                <div style="margin-bottom: 15px;">
+                    <label for="LastName" style="display: block; font-weight: bold;">Last Name</label>
+                    <input type="text" id="LastName" name="LastName" value="@Model.MetadataModel.LastName" style="width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 5px;" />
+                </div>
+
+                <div style="margin-bottom: 15px;">
+                    <label for="DateOfBirth" style="display: block; font-weight: bold;">Date of Birth</label>
+                    <input type="date" id="DateOfBirth" name="DateOfBirth" value="@Model.MetadataModel.DateOfBirth.ToString("yyyy-MM-dd")" style="width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 5px;" />
+                </div>
+
+                <button type="submit" style="background-color: #007bff; color: white; padding: 10px 20px; border: none; border-radius: 5px; cursor: pointer;">
+                    Update Account
+                </button>
+            </form>
+        </div>
+    </div>
+</div>

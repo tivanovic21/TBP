@@ -29,7 +29,13 @@ public class ApplicationDbContext : DbContext
             
         modelBuilder.Entity<User>().ToTable("users")
             .HasKey(u => u.ID);
-
+        
+        modelBuilder.Entity<User>()
+            .Property(u => u.UpdatedAt)
+            .ValueGeneratedOnUpdate()
+            .HasDefaultValueSql("CURRENT_TIMESTAMP")
+            .Metadata.SetAfterSaveBehavior(Microsoft.EntityFrameworkCore.Metadata.PropertySaveBehavior.Ignore);
+        
         modelBuilder.Entity<Metadata>().HasNoKey();
         modelBuilder.Ignore<Metadata>();
         

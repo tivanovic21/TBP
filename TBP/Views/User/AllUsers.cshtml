@@ -1,0 +1,52 @@
+@using Microsoft.EntityFrameworkCore.Infrastructure
+@using TBP.Data
+@model IEnumerable<TBP.Models.User>
+
+@{
+    ViewData["Title"] = "All Users";
+}
+
+<h1>All Users</h1>
+
+<table class="table table-striped">
+    <thead>
+    <tr>
+        <th>ID</th>
+        <th>Email</th>
+        <th>First Name</th>
+        <th>Last Name</th>
+        <th>Date of Birth</th>
+        <th>Age</th>
+        <th>IsDeleted</th>
+        <th>Actions</th>
+    </tr>
+    </thead>
+    <tbody>
+    @if (Model.Any())
+    {
+        foreach (var user in Model)
+        {
+            <tr>
+                <td>@user.ID</td>
+                <td>@user.Email</td>
+                <td>@user.MetadataModel?.FirstName</td>
+                <td>@user.MetadataModel?.LastName</td>
+                <td>@user.MetadataModel?.DateOfBirth.ToShortDateString()</td>
+                <td>@user.MetadataModel?.Age</td>
+                <td>@user.IsDeleted</td>
+                <td>
+                    <form asp-controller="User" asp-action="DeleteAccount" asp-route-id="@user.ID" method="post" style="display:inline">
+                        <button type="submit" class="btn @(user.IsDeleted ? "btn-secondary" : "btn-danger")" @(user.IsDeleted ? "disabled" : "")>Delete</button>
+                    </form>
+                </td>
+            </tr>
+        }
+    }
+    else
+    {
+        <tr>
+            <td colspan="6" class="text-center">No users found</td>
+        </tr>
+    }
+    </tbody>
+</table>
