@@ -25,7 +25,7 @@ public class UserController : Controller
         if (!await _userService.IsAuthenticatedAsync(HttpContext)) return RedirectToAction("Login", "Authentication");
         if (!await _userService.IsAdminAsync(HttpContext)) return Unauthorized("Only Admin can see all users");
         
-        return View("AllUsers", await _context.Users.OrderBy(u => u.IsDeleted).ToListAsync());
+        return View("AllUsers", await _context.Users.OrderBy(u => u.IsDeleted).ThenBy(u => u.ID).ToListAsync());
     }
 
     public async Task<IActionResult> MyAccount()
@@ -39,7 +39,7 @@ public class UserController : Controller
     }
     
     [HttpPost]
-    public async Task<IActionResult> UpdateAccount(string email, string firstName, string lastName, DateTime dateOfBirth, int? userId = null)
+    public async Task<IActionResult> UpdateAccount(string email, string password, string firstName, string lastName, DateTime dateOfBirth, int? userId = null)
     {
         if (!await _userService.IsAuthenticatedAsync(HttpContext)) return RedirectToAction("Login", "Authentication");
         
@@ -60,8 +60,9 @@ public class UserController : Controller
         };
 
         var command = connection.CreateCommand();
-        command.CommandText = "UPDATE users SET email = @email, metadata = @metadata WHERE id = @userId";
+        command.CommandText = "UPDATE users SET email = @email, password = @password, metadata = @metadata WHERE id = @userId";
         command.Parameters.AddWithValue("email", email);
+        command.Parameters.AddWithValue("password", password);
         
         var metadataParameter = command.Parameters.AddWithValue("metadata", JsonSerializer.Serialize(metadata));
         metadataParameter.NpgsqlDbType = NpgsqlTypes.NpgsqlDbType.Jsonb;

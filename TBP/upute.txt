@@ -1,0 +1,18 @@
+.net uvjeti:
+    - imati ASP.NET Core instaliran 
+        -> https://dotnet.microsoft.com/en-us/apps/aspnet
+    - imati zadovoljavajuću verziju .NET okoline instaliranu (idealno 8) 
+        -> https://dotnet.microsoft.com/en-us/download
+    - potrebno je instalirati sve nuget pakete koji se nalaze u tbp.csproj
+    - imati IDE koji omogućava pokretanje aplikacije / pokrenuti aplikaciju preko terminala
+    
+psql uvjeti:
+    - potrebno je instalirati PostgreSQL
+        -> https://www.postgresql.org/download/
+    - potrebno je moći hostati server kako bi se na isti mogli povezati
+        -> macOS: https://postgresapp.com/
+    - potrebno je kreirati vlastitu bazu i korisnika te promijeniti 
+        connection string u appsettings.json, konkretno "DefaultConnection"
+        
+ako su uvjeti zadovoljeni, dovoljno je pokrenuti server na kojem se nalazi baza, 
+te pokrenuti web aplikaciju 
