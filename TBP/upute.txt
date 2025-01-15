@@ -13,6 +13,7 @@ psql uvjeti:
         -> macOS: https://postgresapp.com/
     - potrebno je kreirati vlastitu bazu i korisnika te promijeniti 
         connection string u appsettings.json, konkretno "DefaultConnection"
+        -> slijediti upute iz dokumentacije ili pogledati auto_generated_script.sql
         
 ako su uvjeti zadovoljeni, dovoljno je pokrenuti server na kojem se nalazi baza, 
 te pokrenuti web aplikaciju 
